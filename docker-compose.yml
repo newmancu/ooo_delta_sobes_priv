@@ -1,0 +1,68 @@
+version: "3.8"
+volumes:
+  static:
+  parcel_db:
+
+services:
+  parcel_web:
+    container_name: parcel_web
+    image: ooo_delta/web
+    build:
+      context: .
+    ports:
+      - 8030:8000
+    env_file:
+      - ./configs/.env
+    environment:
+      - CELERY=0
+    volumes:
+      - ./parcel/:/var/www/web/parcel/
+      - static:/var/www/web/static
+    depends_on:
+      - parcel_db
+      - parcel_redis
+  parcel_celery:
+    container_name: parcel_celery
+    image: ooo_delta/web
+    build:
+      context: .
+    env_file:
+      - ./configs/.env
+    environment:
+      - CELERY=1
+      - CELERY_BEAT=0
+    volumes:
+      - ./parcel/:/var/www/web/parcel/
+    depends_on:
+      - parcel_web
+  parcel_celery_beat:
+    container_name: parcel_celery_beat
+    image: ooo_delta/web
+    build:
+      context: .
+    env_file:
+      - ./configs/.env
+    environment:
+      - CELERY=1
+      - CELERY_BEAT=1
+    volumes:
+      - ./parcel/:/var/www/web/parcel/
+    depends_on:
+      - parcel_web
+  parcel_db:
+    container_name: parcel_db
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    env_file:
+      - ./configs/.env
+    volumes:
+      - parcel_db:/var/lib/mysql
+  parcel_redis:
+    container_name: parcel_redis
+    image: redis
+    restart: always
+    env_file:
+      - ./configs/.env
+    volumes:
+      - parcel_db:/var/lib/mysql
