@@ -140,17 +140,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REDIS_HOST = getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = getenv('REDIS_port', '6379')
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# https://tute.io/how-to-cache-django-rest-framework-with-redis
+# STORING SESSION IN REDIS
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# SESSION_CACHE_ALIAS = "default"
+CACHE_TTL = 5*60 
+
 # CELERY SETTINGS
 
 CELERY_TIMEZONE = "Europe/Moscow"
 CELERY_TASK_TRACK_STARTED = True
-CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_TASK_TIME_LIMIT = 10 * 60
 
 CELERY_BROKER_URL = CELERY_RESULT_BACKEND= f"redis://{REDIS_HOST}:{REDIS_PORT}"
 CELERY_BEAT_SCHEDULE = {
     "perodic_update": {
         "task": "parcel_api.tasks.perodic_update",
-        "schedule": crontab(minute="*/1"),
+        "schedule": crontab(minute="*/5"),
     }
 }
 
