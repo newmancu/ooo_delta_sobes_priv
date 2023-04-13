@@ -11,7 +11,7 @@ class Usd2RubMockResponse:
 
     def __init__(self):
         self.status_code = 200
- 
+
     def json(self):
         return {
             "Date": "2023-04-08T11:30:00+03:00",
@@ -39,18 +39,18 @@ class ParcelTestCase(APITestCase):
         self.t2 = ParcelTypeModel.objects.create(name='Электроника')
         self.t3 = ParcelTypeModel.objects.create(name='Разное')
 
-        names = ['test1','test2','test3', 'test4']
+        names = ['test1', 'test2', 'test3', 'test4']
         weights = [1.0, 1.2, 2.0, 3.5]
-        prices = [0.0,1.0,2.0,1.4]
-        types = [self.t1.id,self.t2.id,self.t3.id,self.t1.id]
+        prices = [0.0, 1.0, 2.0, 1.4]
+        types = [self.t1.id, self.t2.id, self.t3.id, self.t1.id]
         self.parcels = [
             {
                 'name': n,
                 'weight': w,
                 'parcel_price': p,
                 'type': t
-            } 
-            for n,w,p,t 
+            }
+            for n, w, p, t
             in zip(names, weights, prices, types)
         ]
 
@@ -77,38 +77,38 @@ class ParcelTestCase(APITestCase):
 
     def test_parcel_negative_create(self):
         res = self.client.post(
-                reverse('register_parcel'),
-                {
-                    'name': 'neg1',
-                    'weight': -12,
-                    'parcel_price': 12,
-                    'type': self.t1.id
-                },
-                format='json'
+            reverse('register_parcel'),
+            {
+                'name': 'neg1',
+                'weight': -12,
+                'parcel_price': 12,
+                'type': self.t1.id
+            },
+            format='json'
         )
         self.assertNotEqual(res.status_code, 201)
-        
+
         res = self.client.post(
-                reverse('register_parcel'),
-                {
-                    'name': 'neg2',
-                    'weight': 12,
-                    'parcel_price': -12,
-                    'type': self.t1.id
-                },
-                format='json'
+            reverse('register_parcel'),
+            {
+                'name': 'neg2',
+                'weight': 12,
+                'parcel_price': -12,
+                'type': self.t1.id
+            },
+            format='json'
         )
         self.assertNotEqual(res.status_code, 201)
-        
+
         res = self.client.post(
-                reverse('register_parcel'),
-                {
-                    'name': 'neg3',
-                    'weight': 0,
-                    'parcel_price': 0,
-                    'type': self.t1.id
-                },
-                format='json'
+            reverse('register_parcel'),
+            {
+                'name': 'neg3',
+                'weight': 0,
+                'parcel_price': 0,
+                'type': self.t1.id
+            },
+            format='json'
         )
         self.assertEqual(res.status_code, 201)
 
@@ -116,33 +116,31 @@ class ParcelTestCase(APITestCase):
     def test_get_parsel_by_id(self, *args, **kwargs):
         obj = self.parcels[0].copy()
         res = self.client.post(
-                reverse('register_parcel'),
-                obj,
-                format='json'
+            reverse('register_parcel'),
+            obj,
+            format='json'
         )
-        print(f"{obj=}")
-        print(f"{res.content=}")
         pid = res.json()['id']
 
         ret = self.client.get(
-            reverse('parcel-detail',kwargs={'pk':pid}),
+            reverse('parcel-detail', kwargs={'pk': pid}),
             format='json'
         )
         obj.update({
-            'id':pid,
+            'id': pid,
             'deliver_price': "Не рассчитано",
-            'type':self.t1.name
+            'type': self.t1.name
         })
         self.assertEqual(ret.status_code, 200)
         self.assertEqual(ret.json(), obj)
 
         perodic_update.apply()
         USD2RUB = get_usd2rub()
-        
+
         cache.delete_many(cache.keys('views.decorators.cache.cache_page.*'))
 
         ret = self.client.get(
-            reverse('parcel-detail',kwargs={'pk':pid}),
+            reverse('parcel-detail', kwargs={'pk': pid}),
             format='json'
         )
         obj.update({
@@ -154,14 +152,14 @@ class ParcelTestCase(APITestCase):
     def test_get_user_parsels(self, *args, **kwargs):
         client = APIClient()
         client.post(
-                reverse('register_parcel'),
-                self.parcels[0],
-                format='json'
+            reverse('register_parcel'),
+            self.parcels[0],
+            format='json'
         )
         client.post(
-                reverse('register_parcel'),
-                self.parcels[1],
-                format='json'
+            reverse('register_parcel'),
+            self.parcels[1],
+            format='json'
         )
         res = client.get(
             reverse('parcel-list'),
@@ -173,9 +171,9 @@ class ParcelTestCase(APITestCase):
         cache.delete_many(cache.keys('views.decorators.cache.cache_header.*'))
 
         client.post(
-                reverse('register_parcel'),
-                self.parcels[2],
-                format='json'
+            reverse('register_parcel'),
+            self.parcels[2],
+            format='json'
         )
         res = client.get(
             reverse('parcel-list'),
@@ -191,7 +189,7 @@ class TypesTestCase(APITestCase):
         self.t2 = ParcelTypeModel.objects.create(name='Электроника')
         self.t3 = ParcelTypeModel.objects.create(name='Разное')
         self.real = list(map(model_to_dict, [self.t1, self.t2, self.t3]))
-    
+
     def test_get_types(self):
         self.real = list(map(model_to_dict, [self.t1, self.t2, self.t3]))
         cache.clear()

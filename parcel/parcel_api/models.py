@@ -20,11 +20,8 @@ class ParcelTypeModel(models.Model):
         max_length=64
     )
 
-    def __repr__(self) -> str:
-        return self.name
-
     def __str__(self) -> str:
-        return super().__repr__()
+        return self.name
 
 
 class ParcelModel(models.Model):

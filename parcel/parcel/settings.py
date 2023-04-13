@@ -154,7 +154,9 @@ CACHES = {
 # STORING SESSION IN REDIS
 # SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 # SESSION_CACHE_ALIAS = "default"
+
 CACHE_TTL = 5*60 
+UPDATE_CACHE_KEY = 'parcel_update'
 
 # CELERY SETTINGS
 
@@ -166,7 +168,7 @@ CELERY_BROKER_URL = CELERY_RESULT_BACKEND= f"redis://{REDIS_HOST}:{REDIS_PORT}"
 CELERY_BEAT_SCHEDULE = {
     "perodic_update": {
         "task": "parcel_api.tasks.perodic_update",
-        "schedule": crontab(minute="*/5"),
+        "schedule": crontab(minute="*/1"),
     }
 }
 

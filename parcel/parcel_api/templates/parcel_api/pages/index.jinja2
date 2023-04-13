@@ -1,0 +1,9 @@
+{% extends "../wrapper.jinja2" %}
+{% block body %}
+    <input id="csrftoken" type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <input id="update_prices" type="hidden" name="update_prices" value="{% url 'update_prices' %}">
+    <input id="parcel_types" type="hidden" name="parcel_types" value="{% url 'parcel_types' %}">
+    <input id="register_parcel" type="hidden" name="register_parcel" value="{% url 'register_parcel' %}">
+    <input id="parcel-list" type="hidden" name="parcel-list" value="{% url 'parcel-list' %}">
+    <input id="parcel-detail" type="hidden" name="parcel-detail" value="{% url 'parcel-detail' 1 %}">
+{% endblock body %}

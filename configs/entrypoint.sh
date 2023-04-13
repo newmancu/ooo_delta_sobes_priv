@@ -13,15 +13,13 @@ done
 echo "REDIS CONNECTED"
 
 cd ./parcel
+python3 manage.py makemigrations
+python3 manage.py makemigrations parcel_api
+python3 manage.py migrate
+python3 manage.py base_configuration
 if [[ "$CELERY" -eq 0 ]] 
 then
-  python3 manage.py makemigrations
-  python3 manage.py makemigrations parcel_api
-  python3 manage.py migrate
   # python3 manage.py collectstatic --noinput
-
-  python3 manage.py base_configuration
-
   python3 manage.py runserver 0.0.0.0:8000
 else
   if [[ "$CELERY_BEAT" -eq 0 ]]

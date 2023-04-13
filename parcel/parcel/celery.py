@@ -15,16 +15,3 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
-
-
-# TODO: REMOVE default debug_task
-@app.task(bind=True)
-def debug_task(self):
-    print(f'Request: {self.request!r}')
-
-# app.conf.beat_schedule = {
-#     'every': { 
-#         'task': 'parcel_api.tasks.perodic_update',
-#         'schedule': crontab(minute='*/1'),
-#     },
-# }

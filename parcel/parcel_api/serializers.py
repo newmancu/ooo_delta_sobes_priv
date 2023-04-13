@@ -7,7 +7,7 @@ class GetParcelSerializer(ser.ModelSerializer):
     A `GetParcelSerializer` is a ModelSerializer for
     representaiton ParcelModels' objects 
     """
-    
+
     id = ser.UUIDField(format='hex')
     type = ser.SlugRelatedField(
         read_only=True,
@@ -19,10 +19,9 @@ class GetParcelSerializer(ser.ModelSerializer):
         exclude = ['user']
 
     def to_representation(self, instance):
-        # Change this method for different response representation
         ret = super().to_representation(instance)
         ret['deliver_price'] = (
-            "Не рассчитано" if ret['deliver_price'] is None 
+            "Не рассчитано" if ret['deliver_price'] is None
             else ret['deliver_price'])
         return ret
 
@@ -34,21 +33,20 @@ class BaseParcelSerializer(ser.ModelSerializer):
     """
 
     id = ser.UUIDField(format='hex', read_only=True)
+
     class Meta:
         model = models.ParcelModel
         exclude = ['deliver_price']
         extra_kwargs = {
             'user': {
-                'required':False,
+                'required': False,
                 'label': 'auto field'
             }
         }
 
-
     def to_representation(self, instance):
         # Change this method for different response representation
         ret = super().to_representation(instance)
-        print(ret)
         ret.pop('user', '')
         return ret
 

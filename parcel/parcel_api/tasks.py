@@ -1,14 +1,18 @@
 from celery.utils.log import get_task_logger
-from parcel import celery_app
 from django.conf import settings
 from django.db.models import F
+from parcel import celery_app
 from parcel_api.models import ParcelModel
+from parcel_api.middleware import clear_parcels_cache_by_keys
 import requests
 
 logger = get_task_logger(__name__)
 
+
 def get_usd2rub():
-    # returns value from external api
+    """
+    Returns a value from an external api
+    """
 
     # I/O task. Can be wrapped with Thread
     try:
@@ -16,6 +20,7 @@ def get_usd2rub():
         return data['Valute']['USD']['Value']
     except:
         return None
+
 
 @celery_app.task
 def perodic_update(*args, **kwargs):
@@ -32,12 +37,14 @@ def perodic_update(*args, **kwargs):
             "Skiping parcel_price updating."
         )
         return None
-    (ParcelModel.objects
-            .filter(deliver_price=None)
-            .update(deliver_price=(
-                (F('weight') / 2 + F('parcel_price') / 100) * USD2RUB
-    )))
-
+    filtered = ParcelModel.objects.filter(deliver_price=None)
+    keys = filtered.distinct().values_list('user_id', flat=True)
+    clear_parcels_cache_by_keys(keys)
+    filtered.update(deliver_price=(
+        (F('weight') / 2 + F('parcel_price') / 100) * USD2RUB
+    ))
+    logger.info('Cleared keys: %s', keys)
     logger.info(
-        f'set parcel_price to ParcelModel with converter value: {USD2RUB}'
+        'set parcel_price to ParcelModel with converter value: %s.',
+        USD2RUB
     )

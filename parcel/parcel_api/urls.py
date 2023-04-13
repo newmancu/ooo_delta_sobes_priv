@@ -12,6 +12,7 @@ urlpatterns = [
         path('register/', views.RegisterParcelGenerics.as_view(), name='register_parcel'),
         path('types/', views.ListParcelsTypesGenerics.as_view(), name='parcel_types'),
     ])),
+    path('', views.index, name='parcel_index')
 ]
 
 # Urls for developer
