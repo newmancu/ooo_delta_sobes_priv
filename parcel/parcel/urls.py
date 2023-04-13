@@ -13,7 +13,6 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-# from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
@@ -21,19 +20,16 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
 urlpatterns = [
-    # path('admin/', admin.site.urls),
     path('', include('parcel_api.urls'))
 ]
 
 if settings.DEBUG:
-    from rest_framework import permissions
     SchemaView = get_schema_view(
         openapi.Info(
             title="Parcel Api",
             default_version='v1',
-            description="Test description", # TODO: ADD DESCRIPTION
-            contact=openapi.Contact(email="contact@snippets.local"),
-            license=openapi.License(name="BSD License"),
+            description="Техническое задание №2 от ООО Дельта",
+            contact=openapi.Contact(email="newmancu@gmail.com"),
         ),
         public=True,
         permission_classes=[],
